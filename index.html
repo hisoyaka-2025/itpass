@@ -4,9 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>問題画面</title>
- <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css">
+
 <script>
-const LS_KEY = "quizFlags";  // memorizedFlags は使わない
+const LS_KEY = "quizFlags";
+
 const database = [
   [
     "経営理念を説明したものはどれか。",
@@ -20,7 +22,7 @@ const database = [
   ],
   [
     "CSRの説明として、最も適切なものはどれか。",
-    "企業が他社の経営の仕方や業務プロセスを分析し、優れた点を学び、取り入れようとする手法",
+    "企業が他社の経営の仕方や業務プロセスを分析し、優れた点を学び取り入れようとする手法",
     "企業活動において経済的成長だけでなく、環境や社会からの要請に対し責任を果たすことが企業価値向上につながるという考え方",
     "企業の経営者が持つ権力が正しく行使されるように経営者を牽制する制度",
     "他社がまねのできない自社ならではの価値を提供する技術やスキルなど企業の中核となる能力",
@@ -50,7 +52,6 @@ function loadFromLocalStorage() {
   const saved = localStorage.getItem(LS_KEY);
 
   if (!saved) {
-    // 初回 → database の false を保存
     saveToLocalStorage();
     return;
   }
@@ -59,20 +60,17 @@ function loadFromLocalStorage() {
   try {
     savedArray = JSON.parse(saved);
   } catch {
-    // 壊れている → リセット
     resetFlags();
     saveToLocalStorage();
     return;
   }
 
-  // 配列数が違う → リセットして database の false を保存
   if (!Array.isArray(savedArray) || savedArray.length !== database.length) {
     resetFlags();
     saveToLocalStorage();
     return;
   }
 
-  // 配列数が一致 → database に反映
   for (let i = 0; i < database.length; i++) {
     database[i][7] = savedArray[i];
   }
@@ -99,31 +97,26 @@ function resetFlags() {
    ランダム出題（未出題のみ）
 ------------------------------ */
 function showRandomQuestion() {
-
-  // 未出題（false）の問題だけ抽出
   let unsolved = database
     .map((q, idx) => ({ idx, solved: q[7] }))
     .filter(item => !item.solved)
     .map(item => item.idx);
 
-  // 全部 true の場合
   if (unsolved.length === 0) {
     const reset = confirm("すべて正解しました。リセットしますか？");
     if (reset) {
       resetFlags();
       saveToLocalStorage();
-      unsolved = database.map((q, idx) => idx);  // 全問題を対象に戻す
+      unsolved = database.map((q, idx) => idx);
     } else {
       return;
     }
   }
 
-  // ★ 未出題が2問以上ある場合だけ前回問題を除外する
   if (unsolved.length > 1) {
     unsolved = unsolved.filter(idx => idx !== previousIndex);
   }
 
-  // ランダム選択
   const r = Math.floor(Math.random() * unsolved.length);
   currentIndex = unsolved[r];
   previousIndex = currentIndex;
@@ -140,11 +133,14 @@ function loadQuestion(index) {
   document.querySelector(".question-box").textContent = data[0];
 
   const choiceItems = document.querySelectorAll(".choice-item");
+  const kana = ["ア", "イ", "ウ", "エ"];
+
   for (let i = 0; i < 4; i++) {
     const btn = choiceItems[i].querySelector("button");
-    const textNode = choiceItems[i].childNodes[2];
-    btn.textContent = i + 1;
-    textNode.textContent = " " + data[i + 1];
+    btn.textContent = kana[i];  // ボタンはア・イ・ウ・エ
+
+    choiceItems[i].innerText = `${data[i + 1]}`;
+    choiceItems[i].prepend(btn);
   }
 
   document.getElementById("your-answer").textContent = "";
@@ -157,56 +153,52 @@ function loadQuestion(index) {
 ------------------------------ */
 window.onload = function () {
 
-  loadFromLocalStorage();   // ★ ローカルストレージ読み込み
-  showRandomQuestion();     // ★ 初回もランダム
+  loadFromLocalStorage();
+  showRandomQuestion();
 
   const buttons = document.querySelectorAll(".choice-item button");
 
-  // 選択肢クリック
   buttons.forEach(btn => {
     btn.addEventListener("click", function () {
       document.getElementById("your-answer").textContent = this.textContent;
     });
   });
 
-  // 回答ボタン
   document.getElementById("btn-answer").addEventListener("click", function () {
     const yourAns = document.getElementById("your-answer").textContent;
-   // ★ 選択していなければ処理しない
-  if (yourAns === "") {
-    alert("回答を選択してください。");
-    return;
-  }   
-    const correct = database[currentIndex][6];
 
-    if (yourAns === correct) {
-  document.getElementById("correct-answer").innerHTML = 
-    '<span style="color: blue;">正解</span>';
-  database[currentIndex][7] = true;
-  saveToLocalStorage();
+    if (yourAns === "") {
+      alert("回答を選択してください。");
+      return;
+    }
 
-} else {
-  document.getElementById("correct-answer").innerHTML =
-    '<span style="color: red;">不正解</span>' +
-    '<span style="color: black;">（正解　' + correct + '）</span>';
-}
+    const correct = database[currentIndex][6];   // "1"〜"4"
+    const kanaMap = { "1": "ア", "2": "イ", "3": "ウ", "4": "エ" };
+    const correctKana = kanaMap[correct];
 
+    if (yourAns === correctKana) {
+      document.getElementById("correct-answer").innerHTML =
+        '<span style="color: blue;">正解</span>';
+      database[currentIndex][7] = true;
+      saveToLocalStorage();
+    } else {
+      document.getElementById("correct-answer").innerHTML =
+        '<span style="color: red;">不正解</span>' +
+        '<span style="color: black;">（正解　' + correctKana + '）</span>';
+    }
 
     document.getElementById("comment").textContent = database[currentIndex][5];
 
-    // 回答後は選択肢を押せないようにする
     buttons.forEach(btn => btn.disabled = true);
     document.getElementById("btn-answer").disabled = true;
   });
 
-  // 次の問題ボタン
   document.getElementById("btn-next").addEventListener("click", function () {
     showRandomQuestion();
     buttons.forEach(btn => btn.disabled = false);
     document.getElementById("btn-answer").disabled = false;
   });
 
-  // リセットボタン
   document.getElementById("btn-reset").addEventListener("click", function () {
     const result = confirm("暗記記録をリセットしますか？");
     if (result) {
@@ -218,66 +210,51 @@ window.onload = function () {
     }
   });
 
-  // 終了ボタン
   document.getElementById("btn-end").addEventListener("click", function () {
+    alert("ブラウザの仕様により閉じられない場合があります。");
     window.close();
   });
 };
 </script>
-
-
-
 
 </head>
 <body>
 
 <div class="container">
   <div class="buttons">
-        <button id="btn-answer">回答</button>
-        <button id="btn-next">次の問題</button>
-        <button id="btn-reset">リセット</button>        
-        <button id="btn-end">終了</button>
-    </div>
+    <button id="btn-answer">回答</button>
+    <button id="btn-next">次の問題</button>
+    <button id="btn-reset">リセット</button>
+    <button id="btn-end">終了</button>
+  </div>
 
-    <h2>問題</h2>
+  <h2>問題</h2>
 
-    <div class="question-box">
-        問題文
-    </div>
+  <div class="question-box">問題文</div>
 
-   <div class="choices">
-        <div class="choice-item">
-            <button>1</button> １
-        </div>
-        <div class="choice-item">
-            <button>2</button> ２
-        </div>
-        <div class="choice-item">
-            <button>3</button> ３
-        </div>
-        <div class="choice-item">
-            <button>4</button> ４
-        </div>
-    </div>   
+  <div class="choices">
+    <div class="choice-item"><button>ア</button></div>
+    <div class="choice-item"><button>イ</button></div>
+    <div class="choice-item"><button>ウ</button></div>
+    <div class="choice-item"><button>エ</button></div>
+  </div>
 
-   <div class = "chk-area">
+  <div class="chk-area">
     <div class="answer-area">
-        <span class="label">あなたの回答：</span>
-        <span id="your-answer"></span>
+      <span class="label">あなたの回答：</span>
+      <span id="your-answer"></span>
     </div>
 
     <div class="correct-area">
-        <span class="label">判定：</span>
-        <span id="correct-answer"></span>
+      <span class="label">判定：</span>
+      <span id="correct-answer"></span>
     </div>
   </div>
 
-    
-
-    <div class="comment-area">
-        <span class="label">解説：</span>
-        <span id="comment"></span>
-    </div>
+  <div class="comment-area">
+    <span class="label">解説：</span>
+    <span id="comment"></span>
+  </div>
 
 </div>
 
