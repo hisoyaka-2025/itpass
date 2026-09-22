@@ -137,10 +137,10 @@ function loadQuestion(index) {
 
   for (let i = 0; i < 4; i++) {
     const btn = choiceItems[i].querySelector("button");
-    btn.textContent = kana[i];  // ボタンはア・イ・ウ・エ
+    const span = choiceItems[i].querySelector("span");
 
-    choiceItems[i].innerText = `${data[i + 1]}`;
-    choiceItems[i].prepend(btn);
+    btn.textContent = kana[i];
+    span.textContent = data[i + 1];
   }
 
   document.getElementById("your-answer").textContent = "";
@@ -172,7 +172,7 @@ window.onload = function () {
       return;
     }
 
-    const correct = database[currentIndex][6];   // "1"〜"4"
+    const correct = database[currentIndex][6];
     const kanaMap = { "1": "ア", "2": "イ", "3": "ウ", "4": "エ" };
     const correctKana = kanaMap[correct];
 
@@ -221,34 +221,25 @@ window.onload = function () {
 <body>
 
 <div class="container">
-  <div class="buttons">
-    <button id="btn-answer">回答</button>
-    <button id="btn-next">次の問題</button>
-    <button id="btn-reset">リセット</button>
-    <button id="btn-end">終了</button>
-  </div>
-
   <h2>問題</h2>
 
   <div class="question-box">問題文</div>
 
   <div class="choices">
-    <div class="choice-item"><button>ア</button></div>
-    <div class="choice-item"><button>イ</button></div>
-    <div class="choice-item"><button>ウ</button></div>
-    <div class="choice-item"><button>エ</button></div>
+    <div class="choice-item"><button>ア</button><span></span></div>
+    <div class="choice-item"><button>イ</button><span></span></div>
+    <div class="choice-item"><button>ウ</button><span></span></div>
+    <div class="choice-item"><button>エ</button><span></span></div>
   </div>
 
-  <div class="chk-area">
-    <div class="answer-area">
-      <span class="label">あなたの回答：</span>
-      <span id="your-answer"></span>
-    </div>
+  <div class="answer-area">
+    <span class="label">あなたの回答：</span>
+    <span id="your-answer"></span>
+  </div>
 
-    <div class="correct-area">
-      <span class="label">判定：</span>
-      <span id="correct-answer"></span>
-    </div>
+  <div class="correct-area">
+    <span class="label">判定：</span>
+    <span id="correct-answer"></span>
   </div>
 
   <div class="comment-area">
@@ -256,6 +247,12 @@ window.onload = function () {
     <span id="comment"></span>
   </div>
 
+  <div class="buttons">
+    <button id="btn-answer">回答</button>
+    <button id="btn-next">次の問題</button>
+    <button id="btn-reset">リセット</button>
+    <button id="btn-end">終了</button>
+  </div>
 </div>
 
 </body>

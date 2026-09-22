@@ -1,4 +1,3 @@
-/* 全体 */
 body {
     font-family: "Meiryo", sans-serif;
     background-color: #e8f6ff;
@@ -6,16 +5,16 @@ body {
     padding: 20px;
 }
 
-/* コンテナ：スマホ対応 */
 .container {
     width: 100%;
-    max-width: 700px;   /* PCでは700px、スマホでは画面幅いっぱい */
+    max-width: 700px;
     margin: 0 auto;
     background: #ffffff;
     border: 2px solid #b5d9f2;
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    box-sizing: border-box;
 }
 
 h2 {
@@ -23,7 +22,6 @@ h2 {
     color: #0077aa;
 }
 
-/* 問題文 */
 .question-box {
     background: #f0f8ff;
     border-left: 5px solid #66b7e6;
@@ -31,15 +29,11 @@ h2 {
     margin-bottom: 20px;
 }
 
-/* 選択肢 */
-.choices {
-    margin-bottom: 20px;
-}
-
 .choice-item {
     display: flex;
     align-items: center;
     margin-bottom: 10px;
+    flex-wrap: wrap;
 }
 
 .choice-item button {
@@ -51,11 +45,6 @@ h2 {
     cursor: pointer;
 }
 
-.choice-item button:hover {
-    background-color: #b5ddff;
-}
-
-/* 判定・解説 */
 .answer-area, .correct-area, .comment-area {
     margin-bottom: 15px;
     padding: 10px;
@@ -69,7 +58,6 @@ h2 {
     color: #005577;
 }
 
-/* ボタン群（スマホで同じ幅にする） */
 .buttons {
     display: flex;
     flex-wrap: wrap;
@@ -78,7 +66,7 @@ h2 {
 }
 
 .buttons button {
-    flex: 1;                 /* 均等幅 */
+    flex: 1;
     padding: 12px 0;
     background-color: #66b7e6;
     color: #fff;
@@ -88,36 +76,14 @@ h2 {
     font-size: 16px;
 }
 
-.buttons button:hover {
-    background-color: #4aa3d6;
-}
-
-/* ------------------------------
-   スマホ専用調整
------------------------------- */
 @media (max-width: 480px) {
-
     body {
         padding: 10px;
     }
-
     .container {
         padding: 15px;
+        max-width: 100%;
     }
-
-    .choice-item button {
-        padding: 8px 12px;
-        font-size: 16px;
-    }
-
-    .question-box {
-        font-size: 16px;
-    }
-
-    .answer-area, .correct-area, .comment-area {
-        font-size: 15px;
-    }
-
     .buttons button {
         font-size: 15px;
         padding: 14px 0;
