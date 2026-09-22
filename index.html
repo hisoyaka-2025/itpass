@@ -14,7 +14,7 @@ let currentIndex = -1;
 let previousIndex = -1;
 
 // ★ 正順／不順モード（true = 不順＝ランダム）
-let isRandomMode = true;
+let isRandomMode = false;
 
 /* ------------------------------
    ローカルストレージ読み込み
@@ -236,22 +236,25 @@ function setupEventHandlers() {
     window.close();
   });
 
-  /* ------------------------------
-     ★ 正順／不順切り替えボタン
-  ------------------------------ */
-  document.getElementById("btn-rnd").addEventListener("click", function () {
-    isRandomMode = !isRandomMode;
+ /* ------------------------------
+   ★ 正順／不順切り替えボタン
+------------------------------ */
+document.getElementById("btn-rnd").addEventListener("click", function () {
 
-    if (isRandomMode) {
-      this.textContent = "正順";
-      showRandomQuestion();
-    } else {
-      this.textContent = "不順";
-      currentIndex = -1;
-      showSequentialQuestion();
-    }
-  });
-}
+  // トグル切り替え
+  isRandomMode = !isRandomMode;
+
+  if (isRandomMode) {
+    // 不順（ランダム）
+    this.textContent = "不順";
+    showRandomQuestion();
+  } else {
+    // 正順（順番）
+    this.textContent = "正順";
+    currentIndex = -1;
+    showSequentialQuestion();
+  }
+});
 
 /* ------------------------------
    window.onload
