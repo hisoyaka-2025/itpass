@@ -9,39 +9,7 @@
 <script>
 const LS_KEY = "quizFlags";
 
-const database = [
-  [
-    "経営理念を説明したものはどれか。",
-    "企業が活動する際に指針となる基本的な考え方であり、企業の存在意義や価値観などを示したもの",
-    "企業が競争優位性を構築するために活用する資源であり、一般的に人·物·金·情報で分類されるもの",
-    "企業の将来の方向を示したビジョンを具現化するための意思決定計画であり、長期·中期·短期の別に策定されるもの",
-    "企業のもつ個性、固有の企業らしさのことで社風とも呼ばれ、長年の企業活動の中で生み出され定着してきたもの",
-    "経営理念に関する問題では「存在意義」というキーワードがポイントです。",
-    "1",
-    false
-  ],
-  [
-    "CSRの説明として、最も適切なものはどれか。",
-    "企業が他社の経営の仕方や業務プロセスを分析し、優れた点を学び取り入れようとする手法",
-    "企業活動において経済的成長だけでなく、環境や社会からの要請に対し責任を果たすことが企業価値向上につながるという考え方",
-    "企業の経営者が持つ権力が正しく行使されるように経営者を牽制する制度",
-    "他社がまねのできない自社ならではの価値を提供する技術やスキルなど企業の中核となる能力",
-    "CSRは Corporate Social Responsibility の略で「企業の社会的責任」を意味します。",
-    "2",
-    false
-  ],
-  [
-    "性別、年齢、国籍、経験などが個人ごとに異なるような多様性を示す言葉として、適切なものはどれか。",
-    "グラスシーリング",
-    "ダイバーシティ",
-    "ホワイトカラーエグゼンプション",
-    "ワークライフバランス",
-    "多様性を受け入れて活用する考え方をダイバーシティといいます。",
-    "2",
-    false
-  ]
-];
-
+let database = [];  // ← JSONから読み込むため空で定義
 let currentIndex = -1;
 let previousIndex = -1;
 
@@ -149,13 +117,9 @@ function loadQuestion(index) {
 }
 
 /* ------------------------------
-   window.onload
+   イベントハンドラ登録
 ------------------------------ */
-window.onload = function () {
-
-  loadFromLocalStorage();
-  showRandomQuestion();
-
+function setupEventHandlers() {
   const buttons = document.querySelectorAll(".choice-item button");
 
   buttons.forEach(btn => {
@@ -214,6 +178,27 @@ window.onload = function () {
     alert("ブラウザの仕様により閉じられない場合があります。");
     window.close();
   });
+}
+
+/* ------------------------------
+   window.onload
+------------------------------ */
+window.onload = function () {
+
+  // ★ database.json を読み込む
+  fetch("database.json")
+    .then(response => response.json())
+    .then(json => {
+      database = json;
+
+      loadFromLocalStorage();
+      showRandomQuestion();
+      setupEventHandlers();
+    })
+    .catch(err => {
+      alert("database.json の読み込みに失敗しました");
+      console.error(err);
+    });
 };
 </script>
 
@@ -221,6 +206,13 @@ window.onload = function () {
 <body>
 
 <div class="container">
+   <div class="buttons">
+    <button id="btn-answer">回答</button>
+    <button id="btn-next">次の問題</button>
+    <button id="btn-reset">リセット</button>
+    <button id="btn-end">終了</button>
+  </div>
+  
   <h3>問題</h3>
 
   <div class="question-box">問題文</div>
@@ -245,14 +237,7 @@ window.onload = function () {
   <div class="comment-area">
     <span class="label">解説：</span>
     <span id="comment"></span>
-  </div>
-
-  <div class="buttons">
-    <button id="btn-answer">回答</button>
-    <button id="btn-next">次の問題</button>
-    <button id="btn-reset">リセット</button>
-    <button id="btn-end">終了</button>
-  </div>
+  </div> 
 </div>
 
 </body>
