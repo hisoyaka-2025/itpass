@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>問題画面</title>
+ <link rel="stylesheet" href="style.css">
+<script>
+const LS_KEY = "quizFlags";  // memorizedFlags は使わない
+const database = [
+  [
+    "経営理念を説明したものはどれか。",
+    "企業が活動する際に指針となる基本的な考え方であり、企業の存在意義や価値観などを示したもの",
+    "企業が競争優位性を構築するために活用する資源であり、一般的に人·物·金·情報で分類されるもの",
+    "企業の将来の方向を示したビジョンを具現化するための意思決定計画であり、長期·中期·短期の別に策定されるもの",
+    "企業のもつ個性、固有の企業らしさのことで社風とも呼ばれ、長年の企業活動の中で生み出され定着してきたもの",
+    "経営理念に関する問題では「存在意義」というキーワードがポイントです。",
+    "1",
+    false
+  ],
+  [
+    "CSRの説明として、最も適切なものはどれか。",
+    "企業が他社の経営の仕方や業務プロセスを分析し、優れた点を学び、取り入れようとする手法",
+    "企業活動において経済的成長だけでなく、環境や社会からの要請に対し責任を果たすことが企業価値向上につながるという考え方",
+    "企業の経営者が持つ権力が正しく行使されるように経営者を牽制する制度",
+    "他社がまねのできない自社ならではの価値を提供する技術やスキルなど企業の中核となる能力",
+    "CSRは Corporate Social Responsibility の略で「企業の社会的責任」を意味します。",
+    "2",
+    false
+  ],
+  [
+    "性別、年齢、国籍、経験などが個人ごとに異なるような多様性を示す言葉として、適切なものはどれか。",
+    "グラスシーリング",
+    "ダイバーシティ",
+    "ホワイトカラーエグゼンプション",
+    "ワークライフバランス",
+    "多様性を受け入れて活用する考え方をダイバーシティといいます。",
+    "2",
+    false
+  ]
+];
+
+let currentIndex = -1;
+let previousIndex = -1;
+
+/* ------------------------------
+   ローカルストレージ読み込み
+------------------------------ */
+function loadFromLocalStorage() {
+  const saved = localStorage.getItem(LS_KEY);
+
+  if (!saved) {
+    // 初回 → database の false を保存
+    saveToLocalStorage();
+    return;
+  }
+
+  let savedArray;
+  try {
+    savedArray = JSON.parse(saved);
+  } catch {
+    // 壊れている → リセット
+    resetFlags();
+    saveToLocalStorage();
+    return;
+  }
+
+  // 配列数が違う → リセットして database の false を保存
+  if (!Array.isArray(savedArray) || savedArray.length !== database.length) {
+    resetFlags();
+    saveToLocalStorage();
+    return;
+  }
+
+  // 配列数が一致 → database に反映
+  for (let i = 0; i < database.length; i++) {
+    database[i][7] = savedArray[i];
+  }
+}
+
+/* ------------------------------
+   ローカルストレージ保存
+------------------------------ */
+function saveToLocalStorage() {
+  const flags = database.map(row => row[7]);
+  localStorage.setItem(LS_KEY, JSON.stringify(flags));
+}
+
+/* ------------------------------
+   全フラグ false にする
+------------------------------ */
+function resetFlags() {
+  for (let i = 0; i < database.length; i++) {
+    database[i][7] = false;
+  }
+}
+
+/* ------------------------------
+   ランダム出題（未出題のみ）
+------------------------------ */
+function showRandomQuestion() {
+
+  // 未出題（false）の問題だけ抽出
+  let unsolved = database
+    .map((q, idx) => ({ idx, solved: q[7] }))
+    .filter(item => !item.solved)
+    .map(item => item.idx);
+
+  // 全部 true の場合
+  if (unsolved.length === 0) {
+    const reset = confirm("すべて正解しました。リセットしますか？");
+    if (reset) {
+      resetFlags();
+      saveToLocalStorage();
+      unsolved = database.map((q, idx) => idx);  // 全問題を対象に戻す
+    } else {
+      return;
+    }
+  }
+
+  // ★ 未出題が2問以上ある場合だけ前回問題を除外する
+  if (unsolved.length > 1) {
+    unsolved = unsolved.filter(idx => idx !== previousIndex);
+  }
+
+  // ランダム選択
+  const r = Math.floor(Math.random() * unsolved.length);
+  currentIndex = unsolved[r];
+  previousIndex = currentIndex;
+
+  loadQuestion(currentIndex);
+}
+
+/* ------------------------------
+   問題読み込み
+------------------------------ */
+function loadQuestion(index) {
+  const data = database[index];
+
+  document.querySelector(".question-box").textContent = data[0];
+
+  const choiceItems = document.querySelectorAll(".choice-item");
+  for (let i = 0; i < 4; i++) {
+    const btn = choiceItems[i].querySelector("button");
+    const textNode = choiceItems[i].childNodes[2];
+    btn.textContent = i + 1;
+    textNode.textContent = " " + data[i + 1];
+  }
+
+  document.getElementById("your-answer").textContent = "";
+  document.getElementById("correct-answer").textContent = "";
+  document.getElementById("comment").textContent = "";
+}
+
+/* ------------------------------
+   window.onload
+------------------------------ */
+window.onload = function () {
+
+  loadFromLocalStorage();   // ★ ローカルストレージ読み込み
+  showRandomQuestion();     // ★ 初回もランダム
+
+  const buttons = document.querySelectorAll(".choice-item button");
+
+  // 選択肢クリック
+  buttons.forEach(btn => {
+    btn.addEventListener("click", function () {
+      document.getElementById("your-answer").textContent = this.textContent;
+    });
+  });
+
+  // 回答ボタン
+  document.getElementById("btn-answer").addEventListener("click", function () {
+    const yourAns = document.getElementById("your-answer").textContent;
+   // ★ 選択していなければ処理しない
+  if (yourAns === "") {
+    alert("回答を選択してください。");
+    return;
+  }   
+    const correct = database[currentIndex][6];
+
+    if (yourAns === correct) {
+  document.getElementById("correct-answer").innerHTML = 
+    '<span style="color: blue;">正解</span>';
+  database[currentIndex][7] = true;
+  saveToLocalStorage();
+
+} else {
+  document.getElementById("correct-answer").innerHTML =
+    '<span style="color: red;">不正解</span>' +
+    '<span style="color: black;">（正解　' + correct + '）</span>';
+}
+
+
+    document.getElementById("comment").textContent = database[currentIndex][5];
+
+    // 回答後は選択肢を押せないようにする
+    buttons.forEach(btn => btn.disabled = true);
+    document.getElementById("btn-answer").disabled = true;
+  });
+
+  // 次の問題ボタン
+  document.getElementById("btn-next").addEventListener("click", function () {
+    showRandomQuestion();
+    buttons.forEach(btn => btn.disabled = false);
+    document.getElementById("btn-answer").disabled = false;
+  });
+
+  // リセットボタン
+  document.getElementById("btn-reset").addEventListener("click", function () {
+    const result = confirm("暗記記録をリセットしますか？");
+    if (result) {
+      resetFlags();
+      saveToLocalStorage();
+      alert("暗記記録をリセットしました。");
+      showRandomQuestion();
+      buttons.forEach(btn => btn.disabled = false);
+    }
+  });
+
+  // 終了ボタン
+  document.getElementById("btn-end").addEventListener("click", function () {
+    window.close();
+  });
+};
+</script>
+
+
+
+
+</head>
+<body>
+
+<div class="container">
+  <div class="buttons">
+        <button id="btn-answer">回答</button>
+        <button id="btn-next">次の問題</button>
+        <button id="btn-reset">リセット</button>        
+        <button id="btn-end">終了</button>
+    </div>
+
+    <h2>問題</h2>
+
+    <div class="question-box">
+        問題文
+    </div>
+
+   <div class="choices">
+        <div class="choice-item">
+            <button>1</button> １
+        </div>
+        <div class="choice-item">
+            <button>2</button> ２
+        </div>
+        <div class="choice-item">
+            <button>3</button> ３
+        </div>
+        <div class="choice-item">
+            <button>4</button> ４
+        </div>
+    </div>   
+
+   <div class = "chk-area">
+    <div class="answer-area">
+        <span class="label">あなたの回答：</span>
+        <span id="your-answer"></span>
+    </div>
+
+    <div class="correct-area">
+        <span class="label">判定：</span>
+        <span id="correct-answer"></span>
+    </div>
+  </div>
+
+    
+
+    <div class="comment-area">
+        <span class="label">解説：</span>
+        <span id="comment"></span>
+    </div>
+
+</div>
+
+</body>
+</html>
