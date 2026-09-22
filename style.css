@@ -1,83 +1,125 @@
+/* 全体 */
+body {
+    font-family: "Meiryo", sans-serif;
+    background-color: #e8f6ff;
+    margin: 0;
+    padding: 20px;
+}
+
+/* コンテナ：スマホ対応 */
+.container {
+    width: 100%;
+    max-width: 700px;   /* PCでは700px、スマホでは画面幅いっぱい */
+    margin: 0 auto;
+    background: #ffffff;
+    border: 2px solid #b5d9f2;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+h2 {
+    margin-top: 0;
+    color: #0077aa;
+}
+
+/* 問題文 */
+.question-box {
+    background: #f0f8ff;
+    border-left: 5px solid #66b7e6;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+/* 選択肢 */
+.choices {
+    margin-bottom: 20px;
+}
+
+.choice-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.choice-item button {
+    margin-right: 10px;
+    padding: 5px 10px;
+    background-color: #cce9ff;
+    border: 1px solid #66b7e6;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.choice-item button:hover {
+    background-color: #b5ddff;
+}
+
+/* 判定・解説 */
+.answer-area, .correct-area, .comment-area {
+    margin-bottom: 15px;
+    padding: 10px;
+    background: #f7fbff;
+    border: 1px solid #cce9ff;
+    border-radius: 5px;
+}
+
+.label {
+    font-weight: bold;
+    color: #005577;
+}
+
+/* ボタン群（スマホで同じ幅にする） */
+.buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.buttons button {
+    flex: 1;                 /* 均等幅 */
+    padding: 12px 0;
+    background-color: #66b7e6;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.buttons button:hover {
+    background-color: #4aa3d6;
+}
+
+/* ------------------------------
+   スマホ専用調整
+------------------------------ */
+@media (max-width: 480px) {
+
     body {
-        font-family: "Meiryo", sans-serif;
-        background-color: #e8f6ff; /* 薄い水色 */
-        margin: 0;
-        padding: 20px;
+        padding: 10px;
     }
 
     .container {
-        width: 700px;
-        margin: 0 auto;
-        background: #ffffff;
-        border: 2px solid #b5d9f2;
-        border-radius: 10px;
-        padding: 20px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    h2 {
-        margin-top: 0;
-        color: #0077aa;
-    }
-
-    .question-box {
-        background: #f0f8ff;
-        border-left: 5px solid #66b7e6;
         padding: 15px;
-        margin-bottom: 20px;
-    }
-
-    .choices {
-        margin-bottom: 20px;
-    }
-
-    .choice-item {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
     }
 
     .choice-item button {
-        margin-right: 10px;
-        padding: 5px 10px;
-        background-color: #cce9ff;
-        border: 1px solid #66b7e6;
-        border-radius: 5px;
-        cursor: pointer;
+        padding: 8px 12px;
+        font-size: 16px;
     }
 
-    .choice-item button:hover {
-        background-color: #b5ddff;
+    .question-box {
+        font-size: 16px;
     }
 
     .answer-area, .correct-area, .comment-area {
-        margin-bottom: 15px;
-        padding: 10px;
-        background: #f7fbff;
-        border: 1px solid #cce9ff;
-        border-radius: 5px;
-    }
-
-    .label {
-        font-weight: bold;
-        color: #005577;
-    }
-
-    .buttons {
-        text-align: center;
-        margin-top: 20px;
+        font-size: 15px;
     }
 
     .buttons button {
-        padding: 10px 20px;
-        margin: 5px;
-        background-color: #66b7e6;
-        color: #fff;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
+        font-size: 15px;
+        padding: 14px 0;
     }
-
-    .buttons button:hover {
-        background-color: #4aa3d6;
-    }
+}
